@@ -15,6 +15,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _firstnameController = TextEditingController();
   final _lastnameController = TextEditingController();
   final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
@@ -25,6 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _firstnameController.dispose();
     _lastnameController.dispose();
     _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -41,6 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       firstname: _firstnameController.text.trim(),
       lastname: _lastnameController.text.trim(),
       username: _usernameController.text.trim(),
+      email: _emailController.text.trim(),
       password: _passwordController.text,
       confirmPassword: _confirmPasswordController.text,
     );
@@ -203,6 +206,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Username is required';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Email field
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          labelStyle: const TextStyle(
+                            color: Color(0xFF444444),
+                            fontWeight: FontWeight.w500,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFCCCCCC),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFc72583),
+                            ),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Email is required';
+                          }
+                          if (!RegExp(
+                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                          ).hasMatch(value)) {
+                            return 'Please enter a valid email';
                           }
                           return null;
                         },

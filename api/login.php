@@ -28,6 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['user_firstname'] = $row['firstname'];
         $_SESSION['user_lastname'] = $row['lastname'];
         $_SESSION['user_username'] = $row['username'];
+        $_SESSION['user_role'] = $row['role'];
+        $_SESSION['user_email'] = $row['email'];
 
         echo json_encode([
             'success' => true,
@@ -36,7 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'id' => $row['id'],
                 'username' => $row['username'],
                 'firstname' => $row['firstname'],
-                'lastname' => $row['lastname']
+                'lastname' => $row['lastname'],
+                'email' => $row['email'],
+                'role' => $row['role']
             ]
         ]);
     } else {

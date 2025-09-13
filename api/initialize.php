@@ -1,10 +1,14 @@
 <?php
+// Disable error reporting to prevent HTML output
+error_reporting(0);
+ini_set('display_errors', 0);
+
 session_start();
 
 $db_hostname = "localhost";
 $db_username = "root";
 $db_password = "";
-$db_name = "sample_db";
+$db_name = "voting_system";
 
 $connection = new mysqli($db_hostname, $db_username, $db_password, $db_name);
 

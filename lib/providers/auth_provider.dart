@@ -54,6 +54,7 @@ class AuthProvider with ChangeNotifier {
     required String firstname,
     required String lastname,
     required String username,
+    required String email,
     required String password,
     required String confirmPassword,
   }) async {
@@ -65,6 +66,7 @@ class AuthProvider with ChangeNotifier {
         firstname: firstname,
         lastname: lastname,
         username: username,
+        email: email,
         password: password,
         confirmPassword: confirmPassword,
       );

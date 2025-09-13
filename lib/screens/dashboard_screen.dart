@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import 'login_screen.dart';
 import 'email_form_screen.dart';
+import 'voting_screen.dart';
+import 'admin_dashboard.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -29,71 +31,76 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFf4f6f8),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFc72583),
-        foregroundColor: Colors.white,
-        title: const Text('Dashboard'),
-        elevation: 0,
-        actions: [
-          Consumer<AuthProvider>(
-            builder: (context, authProvider, child) {
-              return IconButton(
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        // Show admin dashboard for admin users
+        if (authProvider.user?.isAdmin == true) {
+          return const AdminDashboard();
+        }
+
+        // Show regular user dashboard
+        return Scaffold(
+          backgroundColor: const Color(0xFFf4f6f8),
+          appBar: AppBar(
+            backgroundColor: const Color(0xFFc72583),
+            foregroundColor: Colors.white,
+            title: const Text('Dashboard'),
+            elevation: 0,
+            actions: [
+              IconButton(
                 icon: const Icon(Icons.logout),
                 onPressed: authProvider.isLoading
                     ? null
                     : () => _logout(context),
                 tooltip: 'Logout',
-              );
-            },
-          ),
-        ],
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: Card(
-              elevation: 10,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Welcome message
-                    const Icon(
-                      Icons.check_circle,
-                      size: 80,
-                      color: Colors.green,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Congratulations!',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF333333),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'You are now logged in.',
-                      style: TextStyle(fontSize: 18, color: Color(0xFF666666)),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
+            ],
+          ),
+          body: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: Card(
+                  elevation: 10,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Welcome message
+                        const Icon(
+                          Icons.how_to_vote,
+                          size: 80,
+                          color: Color(0xFFc72583),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Welcome to Voting System!',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF333333),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Cast your vote for your preferred candidates.',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Color(0xFF666666),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
 
-                    // User info
-                    Consumer<AuthProvider>(
-                      builder: (context, authProvider, child) {
-                        if (authProvider.user != null) {
-                          return Container(
+                        // User info
+                        if (authProvider.user != null)
+                          Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               color: const Color(0xFFf8f9fa),
@@ -122,54 +129,84 @@ class DashboardScreen extends StatelessWidget {
                                   authProvider.user!.username,
                                 ),
                                 _buildInfoRow(
-                                  'User ID',
-                                  authProvider.user!.id.toString(),
+                                  'Email',
+                                  authProvider.user!.email,
+                                ),
+                                _buildInfoRow(
+                                  'Role',
+                                  authProvider.user!.role.toUpperCase(),
                                 ),
                               ],
                             ),
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                    const SizedBox(height: 24),
+                          ),
+                        const SizedBox(height: 24),
 
-                    // Email form button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const EmailFormScreen(),
+                        // Voting button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const VotingScreen(),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFc72583),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              elevation: 0,
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFc72583),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          elevation: 0,
-                        ),
-                        icon: const Icon(Icons.email),
-                        label: const Text(
-                          'Send Email',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                            icon: const Icon(Icons.how_to_vote),
+                            label: const Text(
+                              'Cast Your Vote',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                    // Logout button
-                    Consumer<AuthProvider>(
-                      builder: (context, authProvider, child) {
-                        return SizedBox(
+                        // Email form button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const EmailFormScreen(),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              elevation: 0,
+                            ),
+                            icon: const Icon(Icons.email),
+                            label: const Text(
+                              'Send Email',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Logout button
+                        SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
                             onPressed: authProvider.isLoading
@@ -204,24 +241,27 @@ class DashboardScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 16),
+                        ),
+                        const SizedBox(height: 16),
 
-                    // Additional info
-                    const Text(
-                      'By: RPSV_CODES',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF666666)),
-                      textAlign: TextAlign.center,
+                        // Additional info
+                        const Text(
+                          'By: RPSV_CODES',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF666666),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

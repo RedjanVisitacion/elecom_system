@@ -10,7 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                 'id' => $_SESSION['user_id'],
                 'username' => $_SESSION['user_username'],
                 'firstname' => $_SESSION['user_firstname'],
-                'lastname' => $_SESSION['user_lastname']
+                'lastname' => $_SESSION['user_lastname'],
+                'email' => $_SESSION['user_email'] ?? '',
+                'role' => $_SESSION['user_role'] ?? 'user'
             ]
         ]);
     } else {

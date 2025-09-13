@@ -33,6 +33,7 @@ class AuthService {
     required String firstname,
     required String lastname,
     required String username,
+    required String email,
     required String password,
     required String confirmPassword,
   }) async {
@@ -44,6 +45,7 @@ class AuthService {
           'firstname': firstname,
           'lastname': lastname,
           'username': username,
+          'email': email,
           'password': password,
           'confirm_password': confirmPassword,
         },

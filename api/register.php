@@ -5,6 +5,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $firstname = $_POST['firstname'] ?? '';
     $lastname = $_POST['lastname'] ?? '';
     $username = $_POST['username'] ?? '';
+    $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
 
@@ -33,6 +34,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
     
+    if (empty($email)) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Email is required'
+        ]);
+        exit();
+    }
+    
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Invalid email format'
+        ]);
+        exit();
+    }
+    
     if (empty($password)) {
         echo json_encode([
             'success' => false,
@@ -57,17 +74,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    // Check if username already exists
-    $check_sql = "SELECT id FROM users WHERE username = ?";
+    // Check if username or email already exists
+    $check_sql = "SELECT id FROM users WHERE username = ? OR email = ?";
     $check_stmt = $connection->prepare($check_sql);
-    $check_stmt->bind_param("s", $username);
+    $check_stmt->bind_param("ss", $username, $email);
     $check_stmt->execute();
     $check_result = $check_stmt->get_result();
 
     if ($check_result->num_rows > 0) {
         echo json_encode([
             'success' => false,
-            'message' => 'Username already exists'
+            'message' => 'Username or email already exists'
         ]);
         $check_stmt->close();
         exit();
@@ -76,10 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Insert new user
     $encrypted_password = md5($password);
-    $sql = "INSERT INTO users (firstname, lastname, username, password) VALUES (?, ?, ?, ?)";
+    $sql = "INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)";
     
     $stmt = $connection->prepare($sql);
-    $stmt->bind_param("ssss", $firstname, $lastname, $username, $encrypted_password);
+    $stmt->bind_param("sssss", $firstname, $lastname, $username, $email, $encrypted_password);
 
     if ($stmt->execute()) {
         echo json_encode([
