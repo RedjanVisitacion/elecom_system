@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/candidate.dart';
 import '../models/vote.dart';
+import 'http_service.dart';
 
 class VotingService {
   static const String baseUrl = 'http://localhost/elecom_system/api';
@@ -44,14 +45,14 @@ class VotingService {
     required String position,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/votes.php'),
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: {'candidate_id': candidateId.toString(), 'position': position},
+      HttpService.initialize();
+      final response = await HttpService.post(
+        '/votes.php',
+        data: {'candidate_id': candidateId.toString(), 'position': position},
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
         return {'success': data['success'], 'message': data['message']};
       } else {
         return {
@@ -67,13 +68,11 @@ class VotingService {
   // Get user's votes
   static Future<Map<String, dynamic>> getUserVotes() async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/votes.php'),
-        headers: {'Content-Type': 'application/json'},
-      );
+      HttpService.initialize();
+      final response = await HttpService.get('/votes.php');
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
         if (data['success']) {
           final votes = (data['votes'] as List)
               .map((json) => Vote.fromJson(json))
@@ -99,13 +98,11 @@ class VotingService {
   // Get voting results (admin only)
   static Future<Map<String, dynamic>> getResults() async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/results.php'),
-        headers: {'Content-Type': 'application/json'},
-      );
+      HttpService.initialize();
+      final response = await HttpService.get('/results.php');
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
         return {
           'success': data['success'],
           'results': data['results'] ?? {},
@@ -213,4 +210,3 @@ class VotingService {
     }
   }
 }
-

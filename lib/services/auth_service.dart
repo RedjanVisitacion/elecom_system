@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/auth_response.dart';
+import 'http_service.dart';
 
 class AuthService {
   static const String baseUrl = 'http://localhost/elecom_system/api';
@@ -8,14 +9,14 @@ class AuthService {
   // Login user
   static Future<AuthResponse> login(String username, String password) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/login.php'),
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: {'username': username, 'password': password},
+      HttpService.initialize();
+      final response = await HttpService.post(
+        '/login.php',
+        data: {'username': username, 'password': password},
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
         return AuthResponse.fromJson(data);
       } else {
         return AuthResponse(
@@ -38,10 +39,10 @@ class AuthService {
     required String confirmPassword,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/register.php'),
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: {
+      HttpService.initialize();
+      final response = await HttpService.post(
+        '/register.php',
+        data: {
           'firstname': firstname,
           'lastname': lastname,
           'username': username,
@@ -52,7 +53,7 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
         return AuthResponse.fromJson(data);
       } else {
         return AuthResponse(
@@ -68,13 +69,12 @@ class AuthService {
   // Logout user
   static Future<AuthResponse> logout() async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/logout.php'),
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      );
+      HttpService.initialize();
+      final response = await HttpService.post('/logout.php');
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
+        await HttpService.clearCookies(); // Clear cookies on logout
         return AuthResponse.fromJson(data);
       } else {
         return AuthResponse(
@@ -90,13 +90,11 @@ class AuthService {
   // Check if user is logged in
   static Future<AuthResponse> checkAuth() async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/check_auth.php'),
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      );
+      HttpService.initialize();
+      final response = await HttpService.get('/check_auth.php');
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
         return AuthResponse.fromJson(data);
       } else {
         return AuthResponse(
