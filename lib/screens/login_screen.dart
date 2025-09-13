@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import 'register_screen.dart';
 import 'dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -215,22 +214,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Register link
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const RegisterScreen(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          "Don't have an account? Register here",
-                          style: TextStyle(
-                            color: Color(0xFFc72583),
-                            fontWeight: FontWeight.w500,
-                          ),
+                      // Contact admin message
+                      const Text(
+                        "Don't have an account? Contact your administrator.",
+                        style: TextStyle(
+                          color: Color(0xFF666666),
+                          fontSize: 14,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),

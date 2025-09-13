@@ -5,6 +5,7 @@ import '../services/voting_service.dart';
 import '../providers/auth_provider.dart';
 import 'candidates_management_screen.dart';
 import 'results_screen.dart';
+import 'user_management_screen.dart';
 import 'login_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -176,6 +177,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     _buildOverviewTab(),
                     const CandidatesManagementScreen(),
+                    const UserManagementScreen(),
                     const ResultsScreen(),
                   ],
                 ),
@@ -201,6 +203,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.people),
                 label: 'Candidates',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person_add),
+                label: 'Users',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.analytics),

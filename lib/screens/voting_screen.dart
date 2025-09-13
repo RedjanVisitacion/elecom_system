@@ -19,11 +19,14 @@ class _VotingScreenState extends State<VotingScreen> {
   bool _isSubmitting = false;
   String? _errorMessage;
   bool _showReview = false;
+  bool _hasVoted = false;
+  List<Map<String, dynamic>> _userVotes = [];
 
   @override
   void initState() {
     super.initState();
     _loadCandidates();
+    _checkExistingVotes();
   }
 
   Future<void> _logout(BuildContext context) async {
@@ -152,6 +155,22 @@ class _VotingScreenState extends State<VotingScreen> {
     }
   }
 
+  Future<void> _checkExistingVotes() async {
+    try {
+      final result = await VotingService.getUserVotes();
+      if (result['success']) {
+        final votes = result['votes'] as List<dynamic>;
+        setState(() {
+          _userVotes = votes.cast<Map<String, dynamic>>();
+          _hasVoted = votes.isNotEmpty;
+        });
+      }
+    } catch (e) {
+      // Silently handle error - user can still try to vote
+      print('Error checking existing votes: $e');
+    }
+  }
+
   List<Candidate> _getCandidatesForPosition(String position) {
     return _candidates
         .where((candidate) => candidate.position == position)
@@ -264,6 +283,8 @@ class _VotingScreenState extends State<VotingScreen> {
                 ],
               ),
             )
+          : _hasVoted
+          ? _buildAlreadyVotedView()
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -650,6 +671,133 @@ class _VotingScreenState extends State<VotingScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAlreadyVotedView() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.check_circle,
+                    size: 80,
+                    color: Colors.green[600],
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'You Have Already Voted!',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF333333),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Thank you for participating in the election. Your vote has been recorded.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF666666),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.green[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.green[200]!),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Your Votes:',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        ..._userVotes.map((vote) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFc72583),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  '${vote['position']}: ${vote['candidate_name']}',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Color(0xFF333333),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Card(
+            elevation: 2,
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: Colors.blue,
+                    size: 48,
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'Need Help?',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'If you believe there is an error with your vote or need assistance, please contact your administrator.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF666666),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
